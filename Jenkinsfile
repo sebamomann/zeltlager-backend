@@ -5,7 +5,7 @@ def commit_hash
 
 def tag_name = 'jb_' + branch_name + "_" + build_number
 
-def api_image_name = 'dein-li/dein-li-backend:' + tag_name
+def api_image_name = 'zeltlager/zeltlager-backend:' + tag_name
 
 
 pipeline {
