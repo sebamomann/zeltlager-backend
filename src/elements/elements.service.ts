@@ -28,7 +28,9 @@ export class ElementsService {
 
     async update(elementId: string, element: Element) {
         if (element.parent) {
-            console.log(element.parent);
+            if (element.parent.id == elementId) {
+                throw new Error("Cant set self as parent");
+            }
 
             const parent = await this.elementsRepository.findOne({ where: { id: element.parent.id } })
             element.parent = parent;
@@ -44,7 +46,7 @@ export class ElementsService {
     async findElement(id: any, includeChildren: boolean, includeAncestors: boolean, childrenDepth: number, parentDepth: number): Promise<Element | { element: Element, children: Element[] } | { element: Element, ancestors: Element[] } | { element: Element, ancestors: Element[], children: Element[] }> {
         const element = await this.elementsRepository.findOne({ where: { id } });
 
-        this.handleAncestorsAndDescendents(element, includeChildren, includeAncestors, childrenDepth, parentDepth);
+        await this.handleAncestorsAndDescendents(element, includeChildren, includeAncestors, childrenDepth, parentDepth);
 
         return element;
     }
