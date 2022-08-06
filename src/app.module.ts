@@ -6,6 +6,8 @@ import { Element } from './elements/elements.entity';
 import { ElementsModule } from './elements/elements.module';
 import { RootsModule } from './elements/roots/roots.module';
 
+require("dotenv").config()
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({

@@ -1,13 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { randomUUID } from 'crypto';
 import { Like, TreeRepository } from 'typeorm';
 import { Element } from './elements.entity';
 
 @Injectable()
 export class ElementsService {
-    async findElementByNameMatch(name: string) {
-        return await this.elementsRepository.find({ where: { name: Like(`%${name}%`) } })
+    async findElementByNameMatch(name: string, includeChildren: boolean, includeAncestors: boolean, childrenDepth: number, parentDepth: number) {
+        const elements = await this.elementsRepository.find({ where: { name: Like(`%${name}%`) } })
+        for (let i = 0; i < elements.length; i++) {
+            elements[i] = await this.handleAncestorsAndDescendents(elements[i], includeChildren, includeAncestors, childrenDepth, parentDepth);
+        }
+
+        return elements;
+
     }
     async getRoots(depth: number): Promise<Element[]> {
         return await this.elementsRepository.manager.getTreeRepository(Element).findTrees({ depth });
@@ -37,8 +42,14 @@ export class ElementsService {
     }
 
     async findElement(id: any, includeChildren: boolean, includeAncestors: boolean, childrenDepth: number, parentDepth: number): Promise<Element | { element: Element, children: Element[] } | { element: Element, ancestors: Element[] } | { element: Element, ancestors: Element[], children: Element[] }> {
-        let element = await this.elementsRepository.findOne({ where: { id } });
+        const element = await this.elementsRepository.findOne({ where: { id } });
 
+        this.handleAncestorsAndDescendents(element, includeChildren, includeAncestors, childrenDepth, parentDepth);
+
+        return element;
+    }
+
+    async handleAncestorsAndDescendents(element: Element, includeChildren: boolean, includeAncestors: boolean, childrenDepth: number, parentDepth: number) {
         if (!includeAncestors && !includeChildren)
             return element;
 
@@ -57,7 +68,6 @@ export class ElementsService {
                     { depth: parentDepth }
                 )
         }
-
 
         return element;
     }

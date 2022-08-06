@@ -9,14 +9,22 @@ export class ElementsController {
     }
 
     @Get('')
-    async findByNameMatch(@Query("name") name: string) {
-        const elements = await this.elementsService.findElementByNameMatch(name)
+    async findByNameMatch(@Query("name") name: string,
+        @Query("children") includeChildren: boolean,
+        @Query("parents") includeAncestors: boolean,
+        @Query("childrenDepth") childrenDepth: number,
+        @Query("parentDepth") parentDepth: number) {
+        const elements = await this.elementsService.findElementByNameMatch(name, includeChildren, includeAncestors, childrenDepth, parentDepth)
 
         return elements;
     }
 
     @Get(':id')
-    async findOne(@Param("id") id, @Query("children") includeChildren: boolean, @Query("parents") includeAncestors: boolean, @Query("childrenDepth") childrenDepth: number, @Query("parentDepth") parentDepth: number) {
+    async findOne(@Param("id") id,
+        @Query("children") includeChildren: boolean,
+        @Query("parents") includeAncestors: boolean,
+        @Query("childrenDepth") childrenDepth: number,
+        @Query("parentDepth") parentDepth: number) {
         const element = await this.elementsService.findElement(id, includeChildren, includeAncestors, childrenDepth, parentDepth)
 
         return element;
